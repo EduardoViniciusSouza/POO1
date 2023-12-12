@@ -24,7 +24,7 @@ public class User {
   public interface CreateUser {
   }
 
-  public interface UptdateUser {
+  public interface UpdateUser {
   }
 
   public static final String TABLE_NAME = "user";
@@ -40,7 +40,7 @@ public class User {
   private String name;
 
   @Column(name = "email", length = 100, nullable = false, unique = true)
-  @NotBlank(groups = { CreateUser.class, UptdateUser.class })
+  @NotBlank(groups = { CreateUser.class, UpdateUser.class })
   private String email;
 
   @Column(name = "foneNumber", length = 100, nullable = false, unique = true)
@@ -48,7 +48,7 @@ public class User {
   private String foneNumber;
 
   @Column(name = "password", nullable = false)
-  @NotNull(groups = { CreateUser.class, UptdateUser.class })
+  @NotNull(groups = { CreateUser.class, UpdateUser.class })
   private String password;
 
   @OneToMany(mappedBy = "user")
