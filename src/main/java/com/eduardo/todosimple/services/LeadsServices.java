@@ -1,6 +1,7 @@
 package com.eduardo.todosimple.services;
 
 import java.util.Optional;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,14 @@ public class LeadsServices {
 
     return leads.orElseThrow(
         () -> new RuntimeException("Contato nao encontrado! Id: " + id + ", Tip: " + Leads.class.getName()));
+
+  }
+
+  public List<Leads> findAllByUserId(Long userId) {
+
+    List<Leads> leads = this.leadsRepository.findByUser_Id(userId);
+
+    return leads;
 
   }
 
