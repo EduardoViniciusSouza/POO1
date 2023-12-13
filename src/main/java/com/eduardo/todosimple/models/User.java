@@ -16,6 +16,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
 @Entity
 
 @Table(name = User.TABLE_NAME)
@@ -49,9 +52,11 @@ public class User {
 
   @Column(name = "password", nullable = false)
   @NotNull(groups = { CreateUser.class, UpdateUser.class })
+  @JsonProperty(access = Access.WRITE_ONLY)
   private String password;
 
   @OneToMany(mappedBy = "user")
+  @JsonProperty(access = Access.WRITE_ONLY)
   private List<Leads> leads = new ArrayList<>();
 
   public User() {
