@@ -44,9 +44,9 @@ public class LeadsCrontroller {
   }
 
   @GetMapping("/user/{userId}")
-  public ResponseEntity<List<Leads>> findAllByUserIdW(@PathVariable Long userId) {
+  public ResponseEntity<List<Leads>> findAllByUserId(@PathVariable Long userId) {
 
-    userServices.findUserById(userId);
+    this.userServices.findUserById(userId);
 
     List<Leads> objs = this.leadsServices.findAllByUserId(userId);
 
