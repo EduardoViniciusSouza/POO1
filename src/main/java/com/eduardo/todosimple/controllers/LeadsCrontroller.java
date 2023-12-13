@@ -19,6 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.eduardo.todosimple.models.Leads;
 import com.eduardo.todosimple.services.LeadsServices;
+import com.eduardo.todosimple.services.UserServices;
 
 import jakarta.validation.Valid;
 
@@ -29,6 +30,9 @@ public class LeadsCrontroller {
 
   @Autowired
   private LeadsServices leadsServices;
+
+  @Autowired
+  private UserServices userServices;
 
   @GetMapping("/{id}")
   public ResponseEntity<Leads> findById(@PathVariable Long id) {
@@ -41,6 +45,8 @@ public class LeadsCrontroller {
 
   @GetMapping("/user/{userId}")
   public ResponseEntity<List<Leads>> findAllByUserIdW(@PathVariable Long userId) {
+
+    userServices.findUserById(userId);
 
     List<Leads> objs = this.leadsServices.findAllByUserId(userId);
 
