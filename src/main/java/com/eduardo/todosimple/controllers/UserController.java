@@ -65,6 +65,7 @@ public class UserController {
 
   }
 
+  @CrossOrigin
   @PostMapping
   @Validated(CreateUser.class)
   public ResponseEntity<User> create(@Valid @RequestBody User obj) {

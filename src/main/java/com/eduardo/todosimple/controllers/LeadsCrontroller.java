@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.eduardo.todosimple.DTO.LeadsResponseDTO;
 import com.eduardo.todosimple.models.Leads;
 import com.eduardo.todosimple.services.LeadsServices;
 import com.eduardo.todosimple.services.UserServices;
@@ -37,12 +38,24 @@ public class LeadsCrontroller {
   private UserServices userServices;
 
   @GetMapping("/{id}")
-  public ResponseEntity<Leads> findById(@PathVariable Long id) {
+  public ResponseEntity<LeadsResponseDTO> findLeadById(@PathVariable Long id) {
+    Leads leadsWithoutUser = leadsServices.findLeadByIdWithoutUser(id);
 
-    Leads obj = this.leadsServices.findLeadById(id);
+    if (leadsWithoutUser != null) {
+      LeadsResponseDTO responseDTO = mapToLeadsResponseDTO(leadsWithoutUser);
+      return ResponseEntity.ok(responseDTO);
+    } else {
+      return ResponseEntity.notFound().build();
+    }
+  }
 
-    return ResponseEntity.ok(obj);
+  private LeadsResponseDTO mapToLeadsResponseDTO(Leads leads) {
+    LeadsResponseDTO responseDTO = new LeadsResponseDTO();
+    responseDTO.setName(leads.getName());
+    responseDTO.setFoneNumber(leads.getFoneNumber());
+    responseDTO.setDescription(leads.getDescription());
 
+    return responseDTO;
   }
 
   @CrossOrigin
@@ -69,40 +82,15 @@ public class LeadsCrontroller {
 
   }
 
-  @PutMapping("/{id}/name")
+  @PutMapping("/{id}")
   @Validated
-  public ResponseEntity<Void> updateName(@Valid @RequestBody Leads obj, @PathVariable Long id) {
+  public ResponseEntity<Void> updateLead(@Valid @RequestBody Leads obj, @PathVariable Long id) {
 
     obj.setId(id);
 
-    this.leadsServices.updateName(obj);
+    this.leadsServices.updateLead(obj);
 
     return ResponseEntity.noContent().build();
-
-  }
-
-  @PutMapping("/{id}/fone")
-  @Validated
-  public ResponseEntity<Void> updateFone(@Valid @RequestBody Leads obj, @PathVariable Long id) {
-
-    obj.setId(id);
-
-    this.leadsServices.updateFone(obj);
-
-    return ResponseEntity.noContent().build();
-
-  }
-
-  @PutMapping("/{id}/description")
-  @Validated
-  public ResponseEntity<Void> updateDescription(@Valid @RequestBody Leads obj, @PathVariable Long id) {
-
-    obj.setId(id);
-
-    this.leadsServices.updateDescription(obj);
-
-    return ResponseEntity.noContent().build();
-
   }
 
   @DeleteMapping("/{id}")

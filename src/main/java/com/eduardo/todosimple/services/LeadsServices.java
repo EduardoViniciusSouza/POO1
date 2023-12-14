@@ -11,6 +11,8 @@ import com.eduardo.todosimple.models.Leads;
 import com.eduardo.todosimple.models.User;
 import com.eduardo.todosimple.repositories.LeadsRepository;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class LeadsServices {
 
@@ -20,13 +22,20 @@ public class LeadsServices {
   @Autowired
   private UserServices userServices;
 
-  public Leads findLeadById(long id) {
+  public Leads findLeadByIdWithoutUser(Long id) {
+    Optional<Leads> leadsOptional = leadsRepository.findById(id);
 
-    Optional<Leads> leads = this.leadsRepository.findById(id);
+    return leadsOptional.map(this::mapLeadsWithoutUser).orElse(null);
+  }
 
-    return leads.orElseThrow(
-        () -> new RuntimeException("Contato nao encontrado! Id: " + id + ", Tip: " + Leads.class.getName()));
+  private Leads mapLeadsWithoutUser(Leads leads) {
+    Leads leadsWithoutUser = new Leads();
+    leadsWithoutUser.setId(leads.getId());
+    leadsWithoutUser.setFoneNumber(leads.getFoneNumber());
+    leadsWithoutUser.setName(leads.getName());
+    leadsWithoutUser.setDescription(leads.getDescription());
 
+    return leadsWithoutUser;
   }
 
   public List<Leads> findAllByUserId(Long userId) {
@@ -53,39 +62,33 @@ public class LeadsServices {
   }
 
   @Transactional
-  public Leads updateDescription(Leads obj) {
+  public void updateLead(Leads lead) {
 
-    Leads newObj = findLeadById(obj.getId());
+    Optional<Leads> existingLead = leadsRepository.findById(lead.getId());
 
-    newObj.setDescription(obj.getDescription());
+    if (existingLead.isPresent()) {
 
-    return this.leadsRepository.save(newObj);
-  }
+      Leads updatedLead = existingLead.get();
 
-  @Transactional
-  public Leads updateFone(Leads obj) {
+      updatedLead.setName(lead.getName());
 
-    Leads newObj = findLeadById(obj.getId());
+      updatedLead.setFoneNumber(lead.getFoneNumber());
 
-    newObj.setFoneNumber(obj.getFoneNumber());
+      updatedLead.setDescription(lead.getDescription());
 
-    return this.leadsRepository.save(newObj);
-  }
+      leadsRepository.save(updatedLead);
 
-  @Transactional
-  public Leads updateName(Leads obj) {
+    } else {
 
-    Leads newObj = findLeadById(obj.getId());
+      throw new EntityNotFoundException("Lead não encontrado com ID: " + lead.getId());
 
-    newObj.setName(obj.getName());
-
-    return this.leadsRepository.save(newObj);
+    }
   }
 
   @Transactional
   public void deleteLead(Long id) {
 
-    findLeadById(id);
+    findLeadByIdWithoutUser(id);
 
     try {
 
