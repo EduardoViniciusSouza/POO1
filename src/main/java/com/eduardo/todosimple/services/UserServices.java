@@ -24,12 +24,23 @@ public class UserServices {
 
   }
 
+  public User login(String email) {
+
+    Optional<User> user = this.userRepository.findByEmail(email);
+
+    return user.orElseThrow(
+        () -> new RuntimeException("Usuario nao encontrado! ID: " + email + ", Tipo: " + User.class.getName()));
+
+  }
+
   @Transactional // Criando usuario
   public User createUser(User obj) {
 
-    obj.setId(null);
+    if (obj.getId() == null) {
+      obj.setId(null);
 
-    obj = this.userRepository.save(obj);
+      obj = this.userRepository.save(obj);
+    }
     return obj;
   }
 

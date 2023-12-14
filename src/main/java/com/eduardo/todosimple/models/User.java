@@ -61,7 +61,6 @@ public class User {
 
   @Column(name = "password", nullable = false)
   @NotNull(groups = { CreateUser.class, UpdateUser.class })
-  @JsonProperty(access = Access.WRITE_ONLY)
   private String password;
 
   @OneToMany(mappedBy = "user")

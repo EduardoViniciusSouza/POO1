@@ -5,6 +5,7 @@ import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,29 +26,55 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/user")
 @Validated
+@CrossOrigin
 public class UserController {
 
   @Autowired
   private UserServices userServices;
 
+  @CrossOrigin
   @GetMapping("/{id}")
   public ResponseEntity<User> findById(@PathVariable Long id) {
 
     User obj = this.userServices.findUserById(id);
 
-    return ResponseEntity.ok().body(obj);
+    ResponseEntity resp = ResponseEntity.ok().body(obj);
+
+    return resp;
+
+  }
+
+  @GetMapping("/{email}/{password}")
+  public ResponseEntity<User> findByPassword(@PathVariable String email, @PathVariable String password) {
+
+    User obj = this.userServices.login(email);
+
+    String passwordd = obj.getPassword();
+
+    System.out.println(password);
+
+    if (!password.equals(passwordd)) {
+
+      return ResponseEntity.badRequest().body(null);
+
+    }
+
+    ResponseEntity resp = ResponseEntity.ok().body(obj);
+
+    return resp;
 
   }
 
   @PostMapping
   @Validated(CreateUser.class)
-  public ResponseEntity<Void> create(@Valid @RequestBody User obj) {
+  public ResponseEntity<User> create(@Valid @RequestBody User obj) {
 
-    this.userServices.createUser(obj);
+    User createdUser = this.userServices.createUser(obj);
 
-    URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
+    URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(createdUser.getId())
+        .toUri();
 
-    return ResponseEntity.created(uri).build();
+    return ResponseEntity.created(uri).body(createdUser);
 
   }
 
